@@ -301,7 +301,7 @@
     "img": "icons/magic/unholy/barrier-fire-pink.webp",
     "system": {
       "description": {
-        "value": "<h2>Level 3: Hex Aura</h2>\n<p>As a Bonus Action, you surround yourself with a baleful aura for 1 minute. The aura is a 30-foot Emanation originating from you and moves with you. It ends early if you are Incapacitated.</p>\n<p>When you activate the aura, choose any number of creatures you can see. The aura does not affect the chosen creatures.</p>\n<p>You can use this feature a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest.</p>\n<p>When you activate Hex Aura, you gain a number of Hex Charges equal to your Proficiency Bonus. You can spend these charges on your Hexblade features. Unspent Hex Charges vanish when the aura ends.</p>\n<p>Unless otherwise stated, a Hexblade feature affects only hostile creatures inside your Hex Aura.</p>",
+        "value": "<h2>Level 3: Hex Aura</h2>\n<p>As a Bonus Action, you surround yourself with a baleful aura for 1 minute. The aura is a 30-foot Emanation originating from you and moves with you. It ends early if you are Incapacitated.</p>\n<p>When you activate the aura, choose any number of creatures you can see. The aura does not affect the chosen creatures.</p>\n<p>You can use this feature a number of times equal to your Charisma modifier (minimum of 1), and you regain all expended uses when you finish a Long Rest.</p>\n<p>When you activate Hex Aura, you gain a number of Hex Charges equal to your Charisma modifier (minimum of 1). You can spend these charges on your Hexblade features. Unspent Hex Charges vanish when the aura ends.</p>\n<p>Unless otherwise stated, a Hexblade feature affects only hostile creatures inside your Hex Aura.</p>",
         "chat": ""
       },
       "source": {
@@ -359,7 +359,7 @@
     "img": "icons/magic/unholy/orb-swirling-teal.webp",
     "system": {
       "description": {
-        "value": "<h2>Hex Charges</h2>\n<p>When you activate Hex Aura, you gain a number of Hex Charges equal to your Proficiency Bonus. You can spend these charges on your Hexblade features. Unspent Hex Charges vanish when the aura ends.</p>\n<p><strong>Foundry use:</strong> Set this resource to full when you activate Hex Aura. Spend one charge when using Soul Reaping, Hexing Challenge, Nimble Escape, Warding Aura, Mend the Bound Spirit, or other Hexblade features that require a Hex Charge.</p>",
+        "value": "<h2>Hex Charges</h2>\n<p>When you activate Hex Aura, you gain a number of Hex Charges equal to your Charisma modifier (minimum of 1). You can spend these charges on your Hexblade features. Unspent Hex Charges vanish when the aura ends.</p>\n<p><strong>Foundry use:</strong> Set this resource to full when you activate Hex Aura. Spend one charge when using Soul Reaping, Hexing Challenge, Nimble Escape, Warding Aura, Mend the Bound Spirit, or other Hexblade features that require a Hex Charge.</p>",
         "chat": ""
       },
       "source": {
@@ -370,7 +370,7 @@
         "book": ""
       },
       "uses": {
-        "max": "@prof",
+        "max": "@abilities.cha.mod",
         "spent": 0,
         "recovery": []
       },

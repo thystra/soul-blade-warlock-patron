@@ -1,3 +1,9 @@
+## 0.1.7
+
+- Changed Hex Charges from Proficiency Bonus to Charisma modifier, minimum 1 by rules text.
+- Updated the Hex Charges tracking item to use @abilities.cha.mod instead of @prof.
+- Fixed lingering invalid orb-swirling-purple.webp icon references.
+
 ## 0.1.6
 
 - Fixed invalid Hex Charges icon path that caused 404 console errors.
