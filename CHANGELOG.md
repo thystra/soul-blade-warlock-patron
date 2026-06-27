@@ -1,3 +1,10 @@
+## 0.1.4
+
+- Updated Hexblade Patron Spells to the alternate playtest spell list.
+- Kept patron spell handling as formatted reference text only; spell-item automation can be added later by PHB UUID macro.
+- Added or refreshed the Mend the Bound Spirit healing activity with Warlock-level scaling.
+- Added a Hexbound Specter Actor compendium and baseline importable NPC actor.
+
 # Changelog
 
 ## 0.1.1
