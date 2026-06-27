@@ -1,3 +1,10 @@
+## 0.1.6
+
+- Fixed invalid Hex Charges icon path that caused 404 console errors.
+- Removed the unreliable built-in Hexbound Specter Summon activity from the feature item.
+- Made the Summon Hexbound Specter macro the supported summon workflow for now.
+- Updated Hexbound Specter feature text to point players and DMs to the macro.
+
 ## 0.1.5
 
 - Added Hexblade Spellcasting Focus text: the Pact Weapon is the conduit for Warlock magic and Hexblade features.
