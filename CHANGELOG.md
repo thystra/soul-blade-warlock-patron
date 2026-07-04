@@ -1,3 +1,12 @@
+## 0.2.2
+
+- Fixed Mend the Bound Spirit healing activities so Foundry rolls the healing dice reliably.
+- Replaced the dynamic custom healing formula with three standard healing activities:
+  - 2d6 + Charisma modifier for Warlock levels 6-9.
+  - 3d6 + Charisma modifier for Warlock levels 10-13.
+  - 4d6 + Charisma modifier for Warlock level 14 or higher.
+- Patch backups now go to `../soul-blade-backups/` instead of the repository working tree.
+
 ## 0.2.1
 
 - Fixed the broken image on the Apply Hexed Steel to Pact Weapon macro.

@@ -828,11 +828,11 @@
     "img": "icons/magic/life/heart-cross-strong-purple-orange.webp",
     "system": {
       "description": {
-        "value": "<h2>Hexbound Specter Healing and Incorporeal Nature</h2>\n<p>The Hexbound Specter can regain Hit Points or gain Temporary Hit Points from your Soul Blade features. It can also regain Hit Points from a spell or magical effect that can affect Undead creatures.</p>\n<p>When a Soul Blade feature would cause you to regain Hit Points or gain Temporary Hit Points, you can cause one Hexbound Specter you summoned to receive that healing or Temporary Hit Points instead, provided the specter is inside your Hex Aura. You do not also receive the healing or Temporary Hit Points unless the feature says otherwise.</p>\n<p>A spell or magical effect that restores Hit Points to a creature can restore Hit Points to the Hexbound Specter if the spell or effect does not exclude Undead. Touch-range healing spells, such as Cure Wounds, can affect the Hexbound Specter in this way.</p>\n<p>Because the Hexbound Specter is incorporeal, it cannot drink potions, consume food, benefit from a healer’s kit, or benefit from salves, poultices, or other physical remedies. Non-spell features that require direct bodily contact, such as Lay on Hands, do not affect the Hexbound Specter unless the feature specifically says it can affect spirits, incorporeal creatures, or Undead.</p>\n<h3>Mend the Bound Spirit</h3>\n<p>While your Hex Aura is active, you can spend 1 Hex Charge as a Bonus Action to restore Hit Points to one Hexbound Specter you summoned inside your Hex Aura. The specter regains Hit Points equal to 2d6 + your Charisma modifier.</p>\n<p>The healing increases to 3d6 + your Charisma modifier when you reach Warlock level 10 and 4d6 + your Charisma modifier when you reach Warlock level 14.</p>\n<p><strong>Foundry roll button:</strong> Use the <em>Mend the Bound Spirit</em> healing activity to roll the correct healing formula. Hex Charge consumption is manual for now; reduce the <em>Hex Charges</em> feature by 1 when you use this activity.</p>",
+        "value": "<h2>Hexbound Specter Healing and Incorporeal Nature</h2>\n<p>The Hexbound Specter can regain Hit Points or gain Temporary Hit Points from your Soul Blade features. It can also regain Hit Points from a spell or magical effect that can affect Undead creatures.</p>\n<p>When a Soul Blade feature would cause you to regain Hit Points or gain Temporary Hit Points, you can cause one Hexbound Specter you summoned to receive that healing or Temporary Hit Points instead, provided the specter is inside your Hex Aura. You do not also receive the healing or Temporary Hit Points unless the feature says otherwise.</p>\n<p>A spell or magical effect that restores Hit Points to a creature can restore Hit Points to the Hexbound Specter if the spell or effect does not exclude Undead. Touch-range healing spells, such as Cure Wounds, can affect the Hexbound Specter in this way.</p>\n<p>Because the Hexbound Specter is incorporeal, it cannot drink potions, consume food, benefit from a healer’s kit, or benefit from salves, poultices, or other physical remedies. Non-spell features that require direct bodily contact, such as Lay on Hands, do not affect the Hexbound Specter unless the feature specifically says it can affect spirits, incorporeal creatures, or Undead.</p>\n<h3>Mend the Bound Spirit</h3>\n<p>While your Hex Aura is active, you can spend 1 Hex Charge as a Bonus Action to restore Hit Points to one Hexbound Specter you summoned inside your Hex Aura. The specter regains Hit Points equal to 2d6 + your Charisma modifier.</p>\n<p>The healing increases to 3d6 + your Charisma modifier when you reach Warlock level 10 and 4d6 + your Charisma modifier when you reach Warlock level 14.</p>\n<p><strong>Foundry roll button:</strong> Use the <em>Mend the Bound Spirit</em> healing activity to roll the correct healing formula. Hex Charge consumption is manual for now; reduce the <em>Hex Charges</em> feature by 1 when you use this activity.</p>\n<p><strong>Foundry Activity Note:</strong> Use the healing activity that matches your Warlock level. The activities are separated into 2d6, 3d6, and 4d6 versions so Foundry’s dnd5e sheet stores and rolls the healing reliably.</p>",
         "chat": ""
       },
       "source": {
-        "custom": "Soul Blade Patron Playtest",
+        "custom": "Soul Blade Patron",
         "rules": "2024",
         "revision": 1,
         "license": "Homebrew Playtest",
@@ -853,13 +853,13 @@
       "properties": [],
       "requirements": "Warlock (Soul Blade Patron) 6",
       "activities": {
-        "hxbMendHeal0001": {
-          "_id": "hxbMendHeal0001",
+        "sbpMendHealL06": {
+          "_id": "sbpMendHealL06",
           "type": "heal",
           "activation": {
             "type": "bonus",
             "value": 1,
-            "condition": "Hex Aura active; spend 1 Hex Charge manually.",
+            "condition": "Hex Aura active; spend 1 Hex Charge manually. Use at Warlock levels 6-9.",
             "override": false
           },
           "consumption": {
@@ -871,7 +871,7 @@
             "spellSlot": false
           },
           "description": {
-            "chatFlavor": "Spend 1 Hex Charge. Restore hit points to one Hexbound Specter you summoned inside your Hex Aura."
+            "chatFlavor": "Spend 1 Hex Charge. Restore 2d6 + your Charisma modifier Hit Points to one Hexbound Specter you summoned inside your Hex Aura. Use at Warlock levels 6-9."
           },
           "duration": {
             "concentration": false,
@@ -906,19 +906,19 @@
             "override": false
           },
           "healing": {
-            "number": null,
-            "denomination": null,
-            "bonus": "",
+            "number": 2,
+            "denomination": 6,
+            "bonus": "@abilities.cha.mod",
             "types": [
               "healing"
             ],
             "custom": {
-              "enabled": true,
-              "formula": "min(4, 2 + floor(max(0, @classes.warlock.levels - 6) / 4))d6 + @abilities.cha.mod"
+              "enabled": false,
+              "formula": ""
             },
             "scaling": {
-              "mode": "whole",
-              "number": null,
+              "mode": "",
+              "number": 1,
               "formula": ""
             }
           },
@@ -928,7 +928,179 @@
             "max": ""
           },
           "sort": 0,
-          "name": "Mend the Bound Spirit",
+          "name": "Mend the Bound Spirit (2d6 + CHA; Warlock 6-9)",
+          "img": "icons/magic/life/heart-cross-strong-purple-orange.webp",
+          "appliedEffects": [],
+          "enchant": {},
+          "visibility": {
+            "level": {
+              "min": null,
+              "max": null
+            }
+          }
+        },
+        "sbpMendHealL10": {
+          "_id": "sbpMendHealL10",
+          "type": "heal",
+          "activation": {
+            "type": "bonus",
+            "value": 1,
+            "condition": "Hex Aura active; spend 1 Hex Charge manually. Use at Warlock levels 10-13.",
+            "override": false
+          },
+          "consumption": {
+            "targets": [],
+            "scaling": {
+              "allowed": false,
+              "max": ""
+            },
+            "spellSlot": false
+          },
+          "description": {
+            "chatFlavor": "Spend 1 Hex Charge. Restore 3d6 + your Charisma modifier Hit Points to one Hexbound Specter you summoned inside your Hex Aura. Use at Warlock levels 10-13."
+          },
+          "duration": {
+            "concentration": false,
+            "value": "",
+            "units": "inst",
+            "special": "",
+            "override": false
+          },
+          "effects": [],
+          "range": {
+            "units": "spec",
+            "special": "Inside your Hex Aura",
+            "override": false
+          },
+          "target": {
+            "template": {
+              "count": "",
+              "contiguous": false,
+              "type": "",
+              "size": "",
+              "width": "",
+              "height": "",
+              "units": ""
+            },
+            "affects": {
+              "count": "1",
+              "type": "ally",
+              "choice": false,
+              "special": "One Hexbound Specter you summoned inside your Hex Aura"
+            },
+            "prompt": true,
+            "override": false
+          },
+          "healing": {
+            "number": 3,
+            "denomination": 6,
+            "bonus": "@abilities.cha.mod",
+            "types": [
+              "healing"
+            ],
+            "custom": {
+              "enabled": false,
+              "formula": ""
+            },
+            "scaling": {
+              "mode": "",
+              "number": 1,
+              "formula": ""
+            }
+          },
+          "uses": {
+            "spent": 0,
+            "recovery": [],
+            "max": ""
+          },
+          "sort": 100000,
+          "name": "Mend the Bound Spirit (3d6 + CHA; Warlock 10-13)",
+          "img": "icons/magic/life/heart-cross-strong-purple-orange.webp",
+          "appliedEffects": [],
+          "enchant": {},
+          "visibility": {
+            "level": {
+              "min": null,
+              "max": null
+            }
+          }
+        },
+        "sbpMendHealL14": {
+          "_id": "sbpMendHealL14",
+          "type": "heal",
+          "activation": {
+            "type": "bonus",
+            "value": 1,
+            "condition": "Hex Aura active; spend 1 Hex Charge manually. Use at Warlock level 14 or higher.",
+            "override": false
+          },
+          "consumption": {
+            "targets": [],
+            "scaling": {
+              "allowed": false,
+              "max": ""
+            },
+            "spellSlot": false
+          },
+          "description": {
+            "chatFlavor": "Spend 1 Hex Charge. Restore 4d6 + your Charisma modifier Hit Points to one Hexbound Specter you summoned inside your Hex Aura. Use at Warlock level 14 or higher."
+          },
+          "duration": {
+            "concentration": false,
+            "value": "",
+            "units": "inst",
+            "special": "",
+            "override": false
+          },
+          "effects": [],
+          "range": {
+            "units": "spec",
+            "special": "Inside your Hex Aura",
+            "override": false
+          },
+          "target": {
+            "template": {
+              "count": "",
+              "contiguous": false,
+              "type": "",
+              "size": "",
+              "width": "",
+              "height": "",
+              "units": ""
+            },
+            "affects": {
+              "count": "1",
+              "type": "ally",
+              "choice": false,
+              "special": "One Hexbound Specter you summoned inside your Hex Aura"
+            },
+            "prompt": true,
+            "override": false
+          },
+          "healing": {
+            "number": 4,
+            "denomination": 6,
+            "bonus": "@abilities.cha.mod",
+            "types": [
+              "healing"
+            ],
+            "custom": {
+              "enabled": false,
+              "formula": ""
+            },
+            "scaling": {
+              "mode": "",
+              "number": 1,
+              "formula": ""
+            }
+          },
+          "uses": {
+            "spent": 0,
+            "recovery": [],
+            "max": ""
+          },
+          "sort": 200000,
+          "name": "Mend the Bound Spirit (4d6 + CHA; Warlock 14+)",
           "img": "icons/magic/life/heart-cross-strong-purple-orange.webp",
           "appliedEffects": [],
           "enchant": {},
