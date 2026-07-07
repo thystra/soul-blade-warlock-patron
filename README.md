@@ -1,10 +1,10 @@
-# Soul Blade Patron Playtest
+# Soul Blade Patron
 
 A local Foundry VTT module for Foundry v14 / dnd5e 5.3.3 containing a homebrew 2024-style Warlock subclass: **Soul Blade Patron Patron**.
 
 ## Contents
 
-- One Item compendium: **Soul Blade Patron Playtest: Items**
+- One Item compendium: **Soul Blade Patron: Items**
 - Subclass item: **Soul Blade Patron**
 - Feature items for levels 3, 6, 10, and 14
 - A level-14 Item Choice advancement for **Greater Hex**
@@ -31,8 +31,3 @@ This module uses a NetDB-style `.db` compendium pack for portability. Foundry v1
 The patron spell list is included as a feature item, but spell grants are not automated because some listed spells may live in official/premium content modules or may not be present in the free SRD 5.2 compendium.
 
 The subclass is intentionally playtest-first. Some features, especially Hex Aura targeting, Hex Charges, and Hexbound Specter behavior, are written as clean rules text rather than fully automated effects.
-
-
-
-
-

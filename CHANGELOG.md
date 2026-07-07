@@ -1,3 +1,9 @@
+## 0.2.3
+
+- Removed remaining playtest language from module and compendium metadata.
+- Cleaned item source text from "Soul Blade Patron Playtest" to "Soul Blade Patron".
+- Updated the Soul Blade Patron subclass description from "2024 Warlock chassis" to "2024/5.5e Warlock class".
+
 ## 0.2.2
 
 - Fixed Mend the Bound Spirit healing activities so Foundry rolls the healing dice reliably.
