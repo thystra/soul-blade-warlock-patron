@@ -1,28 +1,29 @@
 # Soul Blade Patron
 
-A local Foundry VTT module for Foundry v14 / dnd5e 5.3.3 containing a homebrew 2024-style Warlock subclass: **Soul Blade Patron Patron**.
-
-## Contents
-
-- One Item compendium: **Soul Blade Patron: Items**
-- Subclass item: **Soul Blade Patron**
-- Feature items for levels 3, 6, 10, and 14
-- A level-14 Item Choice advancement for **Greater Hex**
-- `CLEAN_COPY.md` with the full readable subclass text
-- `source/soulblade-items.json` with editable JSON source for the pack contents
+A local Foundry VTT module for Foundry v14 / dnd5e 5.3.3 containing a homebrew 2024-style Warlock subclass: **Soul Blade Patron**.
 
 ## Install
 
 Use this link to install via Foundry web interface:
 https://github.com/thystra/soul-blade-warlock-patron/releases/latest/download/module.json
 
-Alternatively, download and extract the desired version and copy the `dnd-5-5-hexblade-warlock` folder into:
+Alternatively, download and extract the desired version and copy the `soul-blade-patron` folder into:
 
 ```text
 {Foundry User Data}/Data/modules/
 ```
 
 Then restart Foundry, enable **Soul Blade Warlock Patron** in your world, and open the Compendium sidebar.
+
+### Package Contents
+
+- One Item compendium: **Soul Blade Patron: Items**
+- Subclass item: **Soul Blade Patron**
+- Feature items for levels 3, 6, 10, and 14
+- A level-14 Item Choice advancement for **Greater Hex**
+- [`CLEANCOPY.md`](https://github.com/thystra/soul-blade-warlock-patron/blob/main/CLEAN_COPY.md) with the full readable subclass text
+- `source/soulblade-items.json` with editable JSON source for the pack contents
+
 
 ## Notes
 
