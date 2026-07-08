@@ -10,7 +10,7 @@ The magic of your patron ensures you always have certain spells ready. When you 
 
 | Warlock Level | Spells |
 |---:|---|
-| 3 | Shield, Wrathful Smite, Hex, Armor of Agathys, Mirror Image (testing vs Hex) |
+| 3 | Shield, Wrathful Smite, Hex, Armor of Agathys, Mirror Image, Hex |
 | 5 | Conjure Barrage, Spirit Shroud |
 | 7 | Shadow of Moil, Staggering Smite |
 | 9 | Steel Wind Strike, Hold Monster |
