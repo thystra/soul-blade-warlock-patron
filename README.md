@@ -7,7 +7,7 @@ A local Foundry VTT module for Foundry v14 / dnd5e 5.3.3 containing a homebrew 2
 Use this link to install via Foundry web interface:
 https://github.com/thystra/soul-blade-warlock-patron/releases/latest/download/module.json
 
-Alternatively, download and extract the desired version and copy the `soul-blade-patron` folder into:
+Alternatively, download and extract the desired version and copy the `soul-blade-warlock-patron` folder into:
 
 ```text
 {Foundry User Data}/Data/modules/
