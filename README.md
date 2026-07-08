@@ -1,6 +1,6 @@
 # Soul Blade Patron
 
-A local Foundry VTT module for Foundry v14 / dnd5e 5.3.3 containing a homebrew 2024-style Warlock subclass: **Soul Blade Patron Patron**.
+A local Foundry VTT module for Foundry v14 / dnd5e 5.3.3 containing a homebrew 2024-style Warlock subclass: **Soul Blade Patron**.
 
 ## Contents
 
