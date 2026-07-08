@@ -15,7 +15,7 @@ Alternatively, download and extract the desired version and copy the `soul-blade
 
 Then restart Foundry, enable **Soul Blade Warlock Patron** in your world, and open the Compendium sidebar.
 
-## Package Contents
+### Package Contents
 
 - One Item compendium: **Soul Blade Patron: Items**
 - Subclass item: **Soul Blade Patron**
