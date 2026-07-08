@@ -21,7 +21,7 @@ Then restart Foundry, enable **Soul Blade Warlock Patron** in your world, and op
 - Subclass item: **Soul Blade Patron**
 - Feature items for levels 3, 6, 10, and 14
 - A level-14 Item Choice advancement for **Greater Hex**
-- [`CLEANCOPY.md`](https://github.com/thystra/soul-blade-warlock-patron/blob/main/CLEAN_COPY.md) with the full readable subclass text
+- [`CLEANCOPY.md`](https://github.com/thystra/soul-blade-warlock-patron/blob/main/CLEANCOPY.md) with the full readable subclass text
 - `source/soulblade-items.json` with editable JSON source for the pack contents
 
 
@@ -32,3 +32,5 @@ This module uses a NetDB-style `.db` compendium pack for portability. Foundry v1
 The patron spell list is included as a feature item, but spell grants are not automated because some listed spells may live in official/premium content modules or may not be present in the free SRD 5.2 compendium.
 
 The subclass is intentionally playtest-first. Some features, especially Hex Aura targeting, Hex Charges, and Hexbound Specter behavior, are written as clean rules text rather than fully automated effects.
+
+AI was used in the making of this package. 
