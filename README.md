@@ -21,7 +21,7 @@ Then restart Foundry, enable **Soul Blade Warlock Patron** in your world, and op
 - Subclass item: **Soul Blade Patron**
 - Feature items for levels 3, 6, 10, and 14
 - A level-14 Item Choice advancement for **Greater Hex**
-- [`CLEAN_COPY.md`](https://github.com/thystra/soul-blade-warlock-patron/blob/main/CLEAN_COPY.md) with the full readable subclass text
+- [`CLEANCOPY.md`](https://github.com/thystra/soul-blade-warlock-patron/blob/main/CLEAN_COPY.md) with the full readable subclass text
 - `source/soulblade-items.json` with editable JSON source for the pack contents
 
 
