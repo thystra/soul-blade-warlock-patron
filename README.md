@@ -34,22 +34,3 @@ The patron spell list is included as a feature item, but spell grants are not au
 Some features, especially Hex Aura targeting, Hex Charges, and Hexbound Specter behavior, are presented as clean rules text rather than fully automated effects.
 
 AI was used in the making of this package.
-
-## Automated Release Workflow
-
-The repository workflow at `.github/workflows/release.yml` packages and uploads
-these assets whenever a GitHub release is published:
-
-- `module.json`
-- `soul-blade-warlock-patron.zip`
-
-After the assets become publicly available, the workflow publishes the same
-version to FoundryMods.
-
-Before the first automated release, claim the module on FoundryMods, generate a
-per-module Package Release token, and add it to this GitHub repository as an
-Actions secret named `FOUNDRYMODS_TOKEN`.
-
-A manual workflow run with **dry_run** enabled validates the FoundryMods token
-and manifest without creating a release. When no tag is supplied, the dry-run
-uses the current committed `module.json` and does not submit a package URL.
