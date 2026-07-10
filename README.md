@@ -27,10 +27,29 @@ Then restart Foundry, enable **Soul Blade Warlock Patron** in your world, and op
 
 ## Notes
 
-This module uses a NetDB-style `.db` compendium pack for portability. Foundry v11+ migrates legacy `.db` packs into LevelDB format on load. If your server refuses to migrate the pack, the full item source is included at `source/hexblade-items.json` and can be imported manually into an Item compendium.
+This module uses a NetDB-style `.db` compendium pack for portability. Foundry v11+ migrates legacy `.db` packs into LevelDB format on load. If your server refuses to migrate the pack, the full item source is included at `source/soulblade-items.json` and can be imported manually into an Item compendium.
 
 The patron spell list is included as a feature item, but spell grants are not automated because some listed spells may live in official/premium content modules or may not be present in the free SRD 5.2 compendium.
 
-The subclass is intentionally playtest-first. Some features, especially Hex Aura targeting, Hex Charges, and Hexbound Specter behavior, are written as clean rules text rather than fully automated effects.
+Some features, especially Hex Aura targeting, Hex Charges, and Hexbound Specter behavior, are presented as clean rules text rather than fully automated effects.
 
-AI was used in the making of this package. 
+AI was used in the making of this package.
+
+## Automated Release Workflow
+
+The repository workflow at `.github/workflows/release.yml` packages and uploads
+these assets whenever a GitHub release is published:
+
+- `module.json`
+- `soul-blade-warlock-patron.zip`
+
+After the assets become publicly available, the workflow publishes the same
+version to FoundryMods.
+
+Before the first automated release, claim the module on FoundryMods, generate a
+per-module Package Release token, and add it to this GitHub repository as an
+Actions secret named `FOUNDRYMODS_TOKEN`.
+
+A manual workflow run with **dry_run** enabled validates the FoundryMods token
+and manifest without creating a release. When no tag is supplied, the dry-run
+uses the current committed `module.json` and does not submit a package URL.

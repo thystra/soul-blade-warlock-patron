@@ -1,0 +1,198 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to package/publish, for example v0.2.5. Leave blank for a FoundryMods dry-run against the current commit."
+        required: false
+        default: ""
+      dry_run:
+        description: "Validate with FoundryMods without saving"
+        required: true
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.ref }}"
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Resolve release inputs
+        id: vars
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ "${{ github.event_name }}" == "release" ]]; then
+            TAG="${{ github.event.release.tag_name }}"
+            CHECKOUT_REF="$TAG"
+            MANIFEST_REF="$TAG"
+            DRY_RUN="false"
+            NOTES_URL="${{ github.event.release.html_url }}"
+            PACKAGE_URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/soul-blade-warlock-patron.zip"
+          else
+            TAG="${{ inputs.tag }}"
+            DRY_RUN="${{ inputs.dry_run }}"
+
+            if [[ -n "$TAG" ]]; then
+              CHECKOUT_REF="$TAG"
+              MANIFEST_REF="$TAG"
+              NOTES_URL="https://github.com/${GITHUB_REPOSITORY}/releases/tag/${TAG}"
+              PACKAGE_URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/soul-blade-warlock-patron.zip"
+            else
+              if [[ "$DRY_RUN" != "true" ]]; then
+                echo "ERROR: A tag is required for a non-dry-run manual publish." >&2
+                exit 2
+              fi
+
+              CHECKOUT_REF="${GITHUB_SHA}"
+              MANIFEST_REF="${GITHUB_SHA}"
+              NOTES_URL="https://github.com/${GITHUB_REPOSITORY}"
+              PACKAGE_URL=""
+            fi
+          fi
+
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "checkout_ref=$CHECKOUT_REF" >> "$GITHUB_OUTPUT"
+          echo "manifest_ref=$MANIFEST_REF" >> "$GITHUB_OUTPUT"
+          echo "dry_run=$DRY_RUN" >> "$GITHUB_OUTPUT"
+          echo "notes_url=$NOTES_URL" >> "$GITHUB_OUTPUT"
+          echo "package_url=$PACKAGE_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Check out release source
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ steps.vars.outputs.checkout_ref }}
+
+      - name: Validate manifest and release version
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ steps.vars.outputs.tag }}
+        run: |
+          set -euo pipefail
+
+          python3 -m json.tool module.json >/dev/null
+
+          MODULE_ID="$(jq -r '.id' module.json)"
+          VERSION="$(jq -r '.version' module.json)"
+
+          [[ "$MODULE_ID" == "soul-blade-warlock-patron" ]] || {
+            echo "ERROR: module.json id is '$MODULE_ID', expected 'soul-blade-warlock-patron'." >&2
+            exit 1
+          }
+
+          if [[ -n "$RELEASE_TAG" ]]; then
+            EXPECTED_VERSION="${RELEASE_TAG#v}"
+            if [[ "$VERSION" != "$EXPECTED_VERSION" ]]; then
+              echo "ERROR: module.json version '$VERSION' does not match release tag '$RELEASE_TAG'." >&2
+              echo "Expected module.json version: $EXPECTED_VERSION" >&2
+              exit 1
+            fi
+          fi
+
+          echo "Validated module id: $MODULE_ID"
+          echo "Validated module version: $VERSION"
+
+      - name: Validate compendium source and packs
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          for source_file in source/soulblade-items.json source/soulblade-actors.json source/soulblade-macros.json; do
+            if [[ -f "$source_file" ]]; then
+              jq . "$source_file" >/dev/null
+              echo "JSON OK: $source_file"
+            fi
+          done
+
+          for pack_file in packs/soulblade-items.db packs/soulblade-actors.db packs/soulblade-macros.db; do
+            if [[ -f "$pack_file" ]]; then
+              while IFS= read -r line; do
+                [[ -z "$line" ]] && continue
+                jq . >/dev/null <<<"$line"
+              done < "$pack_file"
+              echo "NeDB JSON OK: $pack_file"
+            fi
+          done
+
+      - name: Package module
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash scripts/package.sh
+          test -f dist/soul-blade-warlock-patron.zip
+          unzip -t dist/soul-blade-warlock-patron.zip >/dev/null
+
+      - name: Upload GitHub release assets
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          gh release upload "${{ steps.vars.outputs.tag }}" \
+            module.json \
+            "dist/soul-blade-warlock-patron.zip#soul-blade-warlock-patron.zip" \
+            --clobber
+
+      - name: Wait for public release assets
+        if: github.event_name == 'release'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          for url in \
+            "https://github.com/${GITHUB_REPOSITORY}/releases/download/${{ steps.vars.outputs.tag }}/module.json" \
+            "https://github.com/${GITHUB_REPOSITORY}/releases/download/${{ steps.vars.outputs.tag }}/soul-blade-warlock-patron.zip"
+          do
+            echo "Waiting for: $url"
+            ready=false
+
+            for attempt in {1..12}; do
+              code="$(curl -L -sS -o /dev/null -w '%{http_code}' "$url" || true)"
+              if [[ "$code" == "200" ]]; then
+                ready=true
+                break
+              fi
+              echo "Attempt $attempt returned HTTP $code; retrying..."
+              sleep 5
+            done
+
+            if [[ "$ready" != "true" ]]; then
+              echo "ERROR: Release asset did not become publicly available: $url" >&2
+              exit 1
+            fi
+          done
+
+      - name: Publish to FoundryMods
+        env:
+          FOUNDRYMODS_TOKEN: ${{ secrets.FOUNDRYMODS_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          MANIFEST_URL="https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${{ steps.vars.outputs.manifest_ref }}/module.json"
+
+          args=(
+            --manifest-url "$MANIFEST_URL"
+            --notes-url "${{ steps.vars.outputs.notes_url }}"
+            --dry-run "${{ steps.vars.outputs.dry_run }}"
+            --sync-description true
+          )
+
+          if [[ -n "${{ steps.vars.outputs.package_url }}" ]]; then
+            args+=(--package-url "${{ steps.vars.outputs.package_url }}")
+          fi
+
+          scripts/publish-foundrymods.sh "${args[@]}"

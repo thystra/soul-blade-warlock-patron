@@ -20,3 +20,9 @@ packs/*/*.log
 
 # Release ZIPs
 *.zip
+/dist/
+*.bak.*
+apply_*.sh
+packs/soulblade-items/
+packs/soulblade-actors/
+packs/soulblade-macros/
