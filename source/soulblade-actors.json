@@ -62,11 +62,11 @@
           "formula": "12 + half the summoner's Proficiency Bonus, rounded down"
         },
         "hp": {
-          "value": 40,
-          "max": 40,
+          "value": 20,
+          "max": 20,
           "temp": 0,
           "tempmax": 0,
-          "formula": "10 + five times the summoning Warlock's level"
+          "formula": "5 + floor((5 × Warlock Level) / 2)"
         },
         "init": {
           "ability": "",

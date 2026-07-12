@@ -1,3 +1,9 @@
+## 0.2.4
+
+- Reduced Hexbound Specter Hit Points to half the previous scaling.
+- New Hexbound Specter HP formula: `5 + floor((5 × Warlock Level) / 2)`.
+- Updated the Hexbound Specter actor default HP and summon macro HP calculation.
+
 ## 0.2.3
 
 - Removed remaining playtest language from module and compendium metadata.
