@@ -1,3 +1,18 @@
+## 0.2.7 follow-up 2
+
+- Fixed the Apply Hexed Steel to Pact Weapon macro syntax so it can be imported from the compendium.
+
+## 0.2.7 follow-up
+
+- Fixed the Import Soul Blade Patron Spells macro syntax so it can be imported from the compendium.
+
+## 0.2.7
+
+- Updated the release workflow so pushing a `v*` tag creates or updates the GitHub release, uploads `module.json` and `soul-blade-warlock-patron.zip`, and publishes to FoundryMods.
+- Added macro JavaScript validation to the release workflow.
+- Fixed the Summon Hexbound Specter compendium macro syntax error.
+- Rebuilt the summon macro around the reduced Hexbound Specter HP formula: `5 + floor((5 * Warlock Level) / 2)`.
+
 ## 0.2.4
 
 - Reduced Hexbound Specter Hit Points to half the previous scaling.

@@ -1,70 +1,129 @@
 // Import Soul Blade Patron Spells
-// Version: 0.1.5
+// Imports the optional patron spell list onto the selected token's actor,
+// or onto your assigned user character if no token is selected.
 //
-// Usage:
-//   1. Select the Soul Blade actor's token, or assign the actor as your user character.
-//   2. The macro imports spells by UUID when the compendium exists.
-//   3. Missing compendia/spells are skipped and reported.
-//   4. Imported spells are marked "always prepared" when the system data supports that field.
+// This macro imports spell Items by UUID. It does not bundle or redistribute
+// paid spell text; the UUIDs must resolve from compendia available in the world.
 
 const actor = canvas.tokens?.controlled?.[0]?.actor ?? game.user.character;
+
 if (!actor) {
-  ui.notifications.warn("Select a Soul Blade token or assign a character to your user.");
+  ui.notifications.warn("Select a token or assign a character to your user.");
   return;
 }
 
-const spells = [
-  { name: "Shield", uuid: "Compendium.dnd-players-handbook.spells.Item.phbsplShield0000", optional: false },
-  { name: "Wrathful Smite", uuid: "Compendium.dnd-players-handbook.spells.Item.phbsplWrathfulSm", optional: false },
-  { name: "Hex", uuid: "Compendium.dnd-players-handbook.spells.Item.phbsplHex0000000", optional: false },
-  { name: "Armor of Agathys", uuid: "Compendium.dnd-players-handbook.spells.Item.phbsplArmorofAga", optional: false },
-  { name: "Spirit Shroud", uuid: "Compendium.dnd-tashas-cauldron.tcoe-character-options.Item.tcoeSpiritShroud", optional: false },
-  { name: "Conjure Barrage", uuid: "Compendium.dnd-players-handbook.spells.Item.phbsplConjureBar", optional: false },
-  { name: "Staggering Smite", uuid: "Compendium.dnd-players-handbook.spells.Item.phbsplStaggering", optional: false },
-  { name: "Shadow of Moil", uuid: "Compendium.world.ddb-2024-test-ddb-spells.Item.ShadowOfMoil14II", optional: false },
-  { name: "Steel Wind Strike", uuid: "Compendium.dnd-players-handbook.spells.Item.phbsplSteelWindS", optional: false },
-  { name: "Hold Monster", uuid: "Compendium.dnd-players-handbook.spells.Item.phbsplHoldMonste", optional: false },
-  // Playtest extra; not part of the approved v0.1.5 patron table.
-  { name: "Mirror Image", uuid: "Compendium.dnd-players-handbook.spells.Item.phbsplMirrorImag", optional: true }
+const spellEntries = [
+  {
+    level: 3,
+    name: "Shield",
+    uuid: "Compendium.dnd-players-handbook.spells.Item.phbsplShield0000"
+  },
+  {
+    level: 3,
+    name: "Wrathful Smite",
+    uuid: "Compendium.dnd-players-handbook.spells.Item.phbsplWrathfulSm"
+  },
+  {
+    level: 3,
+    name: "Hex",
+    uuid: "Compendium.dnd-players-handbook.spells.Item.phbsplHex0000000"
+  },
+  {
+    level: 3,
+    name: "Armor of Agathys",
+    uuid: "Compendium.dnd-players-handbook.spells.Item.phbsplArmorofAga"
+  },
+  {
+    level: 5,
+    name: "Spirit Shroud",
+    uuid: "Compendium.dnd-tashas-cauldron.tcoe-character-options.Item.tcoeSpiritShroud"
+  },
+  {
+    level: 5,
+    name: "Conjure Barrage",
+    uuid: "Compendium.dnd-players-handbook.spells.Item.phbsplConjureBar"
+  },
+  {
+    level: 7,
+    name: "Staggering Smite",
+    uuid: "Compendium.dnd-players-handbook.spells.Item.phbsplStaggering"
+  },
+  {
+    level: 7,
+    name: "Shadow of Moil",
+    uuid: "Compendium.world.ddb-2024-test-ddb-spells.Item.ShadowOfMoil14II"
+  },
+  {
+    level: 9,
+    name: "Steel Wind Strike",
+    uuid: "Compendium.dnd-players-handbook.spells.Item.phbsplSteelWindS"
+  },
+  {
+    level: 9,
+    name: "Hold Monster",
+    uuid: "Compendium.dnd-players-handbook.spells.Item.phbsplHoldMonste"
+  }
 ];
 
-const existing = new Set(actor.items.map(i => i.name.toLowerCase()));
-const toCreate = [];
-const missing = [];
+const imported = [];
 const skipped = [];
+const missing = [];
+const failed = [];
 
-for (const entry of spells) {
-  if (existing.has(entry.name.toLowerCase())) {
+for (const entry of spellEntries) {
+  const alreadyOwned = actor.items.some((item) => item.type === "spell" && item.name === entry.name);
+  if (alreadyOwned) {
     skipped.push(entry.name);
     continue;
   }
 
-  let doc = null;
   try {
-    doc = await fromUuid(entry.uuid);
-  } catch (err) {
-    console.warn(`Soul Blade spell import failed for ${entry.name}`, entry.uuid, err);
-  }
+    const sourceItem = await fromUuid(entry.uuid);
+    if (!sourceItem) {
+      missing.push(entry.name);
+      continue;
+    }
 
-  if (!doc) {
-    missing.push(entry.name);
-    continue;
-  }
+    const itemData = sourceItem.toObject();
+    itemData.system ??= {};
+    itemData.system.source ??= {};
+    itemData.system.source.custom = "Soul Blade Patron";
 
-  const data = doc.toObject();
-  data._id = foundry.utils.randomID();
-  foundry.utils.setProperty(data, "system.preparation.mode", "always");
-  foundry.utils.setProperty(data, "system.preparation.prepared", true);
-  foundry.utils.setProperty(data, "flags.soul-blade-warlock-patron.patronSpell", true);
-  foundry.utils.setProperty(data, "flags.soul-blade-warlock-patron.sourceUuid", entry.uuid);
-  toCreate.push(data);
+    await actor.createEmbeddedDocuments("Item", [itemData]);
+    imported.push(entry.name);
+  } catch (error) {
+    console.error(`Soul Blade spell import failed for ${entry.name}`, error);
+    failed.push(entry.name);
+  }
 }
 
-if (toCreate.length) await actor.createEmbeddedDocuments("Item", toCreate);
+let content = `<h2>Soul Blade Patron Spells</h2>`;
+content += `<p><strong>Actor:</strong> ${actor.name}</p>`;
 
-let msg = `<h2>Soul Blade Patron Spell Import</h2><p><strong>Actor:</strong> ${actor.name}</p>`;
-if (toCreate.length) msg += `<p><strong>Imported:</strong> ${toCreate.map(s => s.name).join(", ")}</p>`;
-if (skipped.length) msg += `<p><strong>Already present:</strong> ${skipped.join(", ")}</p>`;
-if (missing.length) msg += `<p><strong>Missing UUIDs/compendia:</strong> ${missing.join(", ")}</p>`;
-ChatMessage.create({ speaker: ChatMessage.getSpeaker({ actor }), content: msg });
-ui.notifications.info(`Soul Blade spell import complete: ${toCreate.length} imported, ${missing.length} missing.`);
+if (imported.length) {
+  content += `<p><strong>Imported:</strong> ${imported.join(", ")}</p>`;
+}
+
+if (skipped.length) {
+  content += `<p><strong>Skipped; already present:</strong> ${skipped.join(", ")}</p>`;
+}
+
+if (missing.length) {
+  content += `<p><strong>Missing UUIDs or unavailable compendia:</strong> ${missing.join(", ")}</p>`;
+}
+
+if (failed.length) {
+  content += `<p><strong>Failed:</strong> ${failed.join(", ")}</p>`;
+}
+
+if (!imported.length && !skipped.length && !missing.length && !failed.length) {
+  content += `<p>No spells were processed.</p>`;
+}
+
+await ChatMessage.create({
+  speaker: ChatMessage.getSpeaker({ actor }),
+  content
+});
+
+ui.notifications.info(`Soul Blade spell import complete for ${actor.name}.`);
+

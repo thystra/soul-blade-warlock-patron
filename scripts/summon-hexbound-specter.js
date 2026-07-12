@@ -1,92 +1,126 @@
 // Summon Hexbound Specter
-// Version: 0.1.5
+// Version: 0.2.7
 //
-// Usage:
-//   Select the Soul Blade's token on an active scene and run this macro.
-//   It imports/creates a world actor from the module compendium, scales the copy,
-//   and places a token one grid space to the right of the summoner.
+// Select the Soul Blade warlock token before running this macro. The macro creates
+// a world Actor from the module's Hexbound Specter compendium actor and places an
+// unlinked token beside the summoner when a scene is active.
 
-const summonerToken = canvas.tokens?.controlled?.[0];
+const MODULE_ID = "soul-blade-warlock-patron";
+const ACTOR_PACK = "soulblade-actors";
+const SPECTER_NAME = "Hexbound Specter";
+
+const summonerToken = canvas.tokens?.controlled?.[0] ?? null;
 const summoner = summonerToken?.actor ?? game.user.character;
 
 if (!summoner) {
-  ui.notifications.warn("Select the Soul Blade token or assign a character to your user.");
+  ui.notifications.warn("Select a Soul Blade warlock token or assign a character to your user.");
   return;
 }
 
-const sourceUuid = "Compendium.soul-blade-warlock-patron.soulblade-actors.Actor.hxbSpecterActor1";
-const source = await fromUuid(sourceUuid);
-if (!source) {
-  ui.notifications.error(`Could not find Hexbound Specter actor: ${sourceUuid}`);
-  return;
-}
+const warlockClass = summoner.items.find(item => {
+  const identifier = item.system?.identifier ?? "";
+  return item.type === "class" && (identifier === "warlock" || item.name.toLowerCase() === "warlock");
+});
 
-const warlockClass = summoner.items.find(i => i.type === "class" && (i.system?.identifier === "warlock" || i.name.toLowerCase() === "warlock"));
 const warlockLevel = Number(warlockClass?.system?.levels ?? summoner.system?.classes?.warlock?.levels ?? 0);
-const prof = Number(summoner.system?.attributes?.prof ?? summoner.system?.prof ?? 2);
-const chaMod = Number(summoner.system?.abilities?.cha?.mod ?? 0);
-const ac = 12 + Math.floor(prof / 2);
-const hp = 10 + (5 * Math.max(warlockLevel, 1));
-const damageDice = warlockLevel >= 14 ? "5d6" : warlockLevel >= 10 ? "4d6" : "3d6";
-const damageNumber = warlockLevel >= 14 ? 5 : warlockLevel >= 10 ? 4 : 3;
-const attackBonus = 4 + chaMod;
+if (!warlockLevel) {
+  ui.notifications.warn(`Could not determine ${summoner.name}'s Warlock level.`);
+  return;
+}
 
-// Convert a desired modifier to a score. Used so @abilities.cha.mod roughly matches the summoner.
-const chaScore = Math.max(1, Math.min(30, 10 + (2 * chaMod)));
+const charismaMod = Number(summoner.system?.abilities?.cha?.mod ?? 0);
+const proficiency = Number(summoner.system?.attributes?.prof ?? summoner.system?.prof ?? 2);
 
-const data = source.toObject();
-data._id = foundry.utils.randomID();
-data.name = `${summoner.name}'s Hexbound Specter`;
+// Current v0.2.7 tuning: 5 + floor((5 × Warlock Level) / 2).
+const specterHp = Math.max(1, 5 + Math.floor((5 * warlockLevel) / 2));
+const specterAc = 12 + Math.floor(proficiency / 2);
+const lifeDrainDice = warlockLevel >= 14 ? 5 : warlockLevel >= 10 ? 4 : 3;
+const lifeDrainAttackBonus = 4 + charismaMod;
 
-foundry.utils.setProperty(data, "system.attributes.ac.flat", ac);
-foundry.utils.setProperty(data, "system.attributes.hp.value", hp);
-foundry.utils.setProperty(data, "system.attributes.hp.max", hp);
-foundry.utils.setProperty(data, "system.attributes.prof", prof);
-foundry.utils.setProperty(data, "system.abilities.cha.value", chaScore);
-foundry.utils.setProperty(data, "flags.soul-blade-warlock-patron.summoner", summoner.uuid);
-foundry.utils.setProperty(data, "flags.soul-blade-warlock-patron.warlockLevel", warlockLevel);
-foundry.utils.setProperty(data, "flags.soul-blade-warlock-patron.attackBonus", attackBonus);
-foundry.utils.setProperty(data, "flags.soul-blade-warlock-patron.damageDice", damageDice);
+const pack = game.packs.get(`${MODULE_ID}.${ACTOR_PACK}`);
+if (!pack) {
+  ui.notifications.error(`Could not find compendium pack: ${MODULE_ID}.${ACTOR_PACK}`);
+  return;
+}
 
-// Tune Life Drain activities on the copied actor.
-for (const item of data.items ?? []) {
-  if (item.name !== "Life Drain") continue;
+let sourceActor = null;
+const index = await pack.getIndex({ fields: ["name", "type"] });
+const entry = index.find(document => document.name === SPECTER_NAME) ?? index.find(document => /specter/i.test(document.name));
+if (entry) sourceActor = await pack.getDocument(entry._id);
+
+if (!sourceActor) {
+  ui.notifications.error(`Could not find ${SPECTER_NAME} in ${pack.metadata.label}.`);
+  return;
+}
+
+const actorData = foundry.utils.deepClone(sourceActor.toObject());
+delete actorData._id;
+actorData.name = `${summoner.name}'s Hexbound Specter`;
+actorData.folder = null;
+actorData.ownership = { default: CONST.DOCUMENT_OWNERSHIP_LEVELS.OBSERVER };
+actorData.system ??= {};
+actorData.system.attributes ??= {};
+actorData.system.attributes.hp ??= {};
+actorData.system.attributes.hp.value = specterHp;
+actorData.system.attributes.hp.max = specterHp;
+actorData.system.attributes.ac ??= {};
+actorData.system.attributes.ac.value = specterAc;
+actorData.system.details ??= {};
+actorData.system.details.cr = actorData.system.details.cr ?? 0;
+actorData.system.details.source ??= {};
+actorData.system.details.source.custom = "Soul Blade Patron";
+actorData.prototypeToken ??= {};
+actorData.prototypeToken.name = actorData.name;
+actorData.prototypeToken.actorLink = false;
+actorData.prototypeToken.disposition = CONST.TOKEN_DISPOSITIONS.FRIENDLY;
+
+for (const item of actorData.items ?? []) {
+  if (!/life drain/i.test(item.name ?? "")) continue;
   const activities = item.system?.activities ?? {};
   for (const activity of Object.values(activities)) {
-    if (activity.type !== "attack") continue;
-    foundry.utils.setProperty(activity, "attack.flat", true);
-    foundry.utils.setProperty(activity, "attack.ability", "");
-    foundry.utils.setProperty(activity, "attack.bonus", String(attackBonus));
-  }
-  const activeId = damageNumber === 5 ? "hxbLD5d6" : damageNumber === 4 ? "hxbLD4d6" : "hxbLD3d6";
-  for (const [id, activity] of Object.entries(activities)) {
-    foundry.utils.setProperty(activity, "visibility.level.min", id === activeId ? null : 99);
+    if (activity?.damage?.parts) {
+      for (const part of activity.damage.parts) {
+        if (typeof part === "object") {
+          part.number = lifeDrainDice;
+          part.denomination = 6;
+          part.bonus = "";
+          part.types = ["necrotic"];
+        }
+      }
+    }
+    if (activity?.attack) {
+      activity.attack.bonus = String(lifeDrainAttackBonus);
+    }
+    activity.name = `Life Drain (${lifeDrainDice}d6 Necrotic)`;
   }
 }
 
-const createdActor = await Actor.create(data, { renderSheet: false });
+const specter = await Actor.create(actorData, { renderSheet: false });
 
-if (!canvas.scene || !summonerToken) {
-  ui.notifications.info(`Created actor ${createdActor.name}. Drag it to the scene when ready.`);
-} else {
-  const grid = canvas.grid?.size ?? 100;
-  const tokenData = createdActor.prototypeToken.toObject();
-  tokenData.actorId = createdActor.id;
+let placed = false;
+if (canvas.ready && canvas.scene && summonerToken) {
+  const gridSize = canvas.grid?.size ?? canvas.dimensions?.size ?? 100;
+  const tokenData = foundry.utils.deepClone(specter.prototypeToken.toObject());
+  tokenData.actorId = specter.id;
   tokenData.actorLink = false;
-  tokenData.name = createdActor.name;
-  tokenData.x = summonerToken.document.x + grid;
+  tokenData.name = specter.name;
+  tokenData.x = summonerToken.document.x + gridSize;
   tokenData.y = summonerToken.document.y;
-  tokenData.disposition = summonerToken.document.disposition;
-  tokenData.bar1 = { attribute: "attributes.hp" };
+  tokenData.elevation = summonerToken.document.elevation ?? 0;
+  tokenData.disposition = CONST.TOKEN_DISPOSITIONS.FRIENDLY;
   await canvas.scene.createEmbeddedDocuments("Token", [tokenData]);
-  ui.notifications.info(`Summoned ${createdActor.name}: AC ${ac}, HP ${hp}, Life Drain +${attackBonus} / ${damageDice} necrotic.`);
+  placed = true;
 }
 
-ChatMessage.create({
-  speaker: ChatMessage.getSpeaker({ actor: summoner }),
+await ChatMessage.create({
+  speaker: ChatMessage.getSpeaker({ actor: summoner, token: summonerToken?.document }),
   content: `<h2>Hexbound Specter Summoned</h2>
-  <p><strong>AC:</strong> ${ac}</p>
-  <p><strong>HP:</strong> ${hp}</p>
-  <p><strong>Life Drain:</strong> +${attackBonus} to hit, ${damageDice} Necrotic damage.</p>
-  <p><em>Command behavior remains as written in the Hexbound Specter feature.</em></p>`
+<p><strong>Summoner:</strong> ${summoner.name}</p>
+<p><strong>Warlock Level:</strong> ${warlockLevel}</p>
+<p><strong>Specter HP:</strong> ${specterHp}</p>
+<p><strong>Specter AC:</strong> ${specterAc}</p>
+<p><strong>Life Drain:</strong> +${lifeDrainAttackBonus} to hit, ${lifeDrainDice}d6 Necrotic damage</p>
+<p>${placed ? "A token was placed beside the summoner." : "A world actor was created. Drag it to the scene when ready."}</p>`
 });
+
+ui.notifications.info(`Created ${specter.name} with ${specterHp} HP.`);
